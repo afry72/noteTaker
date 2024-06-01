@@ -21,14 +21,18 @@ const read = () => {
 };
  
 const readAndAppend = async () => {
-  console.log("read function");
+  //console.log("read function");
   const notes = await read();
-  console.log(notes, "async here");
+  //console.log(notes, "async here");
   const parsedData = JSON.parse(notes);
-  console.log(parsedData);
+  //console.log(parsedData);
   return parsedData;
     
 };
+
+//const writeAndAppend = async () => {
+  
+//};
 
 // Create Express.js routes for default '/', '/send' and '/routes' endpoints
 app.get('/', (req, res) => res.send('Navigate to /notes or /index'));
@@ -38,11 +42,22 @@ app.get('/notes', (req, res) =>
 );
 
 app.get('/api/notes', (req, res) => {
-  console.log("api notes");
+  //console.log("api notes");
   readAndAppend("./db/db.json").then ((parsedData) => {
-    console.log(parsedData, "came here");
+    //console.log(parsedData, "came here");
     return res.json(parsedData);
   })
+});
+
+app.post('/api/notes', (req, res) => {
+  // Let the client know that their POST request was received
+  res.json(`${req.method} request received`);
+
+  // Show the user agent information in the terminal
+  console.info(req.rawHeaders);
+
+  // Log our request to the terminal
+  console.info(`${req.method} request received`);
 });
 
 app.get('*', (req, res) =>
