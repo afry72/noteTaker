@@ -4,6 +4,7 @@ const fs = require('fs');
 const util = require('util');
 const readFileAsync = util.promisify(fs.readFile);
 
+
 // Import built-in Node.js package 'path' to resolve path of files that are located on the server
 const path = require('path');
 
@@ -50,14 +51,29 @@ app.get('/api/notes', (req, res) => {
 });
 
 app.post('/api/notes', (req, res) => {
-  // Let the client know that their POST request was received
-  res.json(`${req.method} request received`);
+  // Log that a POST request was received
+  console.info(`${req.method} request received to add a note`);
+  // Destructuring assignment for the items in req.body
 
-  // Show the user agent information in the terminal
-  console.info(req.rawHeaders);
+  const note = JSON.parse();
+  console.log(req.body, "here");
+  
+  if (note) {
+    fs.writeFileSync('db.json', JSON.stringify(note));
+    
 
-  // Log our request to the terminal
-  console.info(`${req.method} request received`);
+    const response = {
+      status: 'success',
+      body: note,
+    };
+
+    console.log(response);
+    res.status(201).json(response);
+
+  }; /* else {
+    res.status(500).json('Error in posting review');
+    console.log("error posting");
+  }; */
 });
 
 app.get('*', (req, res) =>
