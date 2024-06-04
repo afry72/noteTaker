@@ -1,6 +1,1 @@
-[
-    {
-        "title":"Test Title",
-        "text":"Test text"
-    }
-]
+[{"title":"Note Taking App","text":"write your notes here"},{"title":"things to buy","text":"bread\nmilk\neggs","id":2},{"title":"things to do","text":"finish project 11","id":3}]

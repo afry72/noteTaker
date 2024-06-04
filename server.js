@@ -3,6 +3,9 @@ const express = require('express');
 const fs = require('fs');
 const util = require('util');
 const readFileAsync = util.promisify(fs.readFile);
+const writeFileAsync = util.promisify(fs.writeFile);
+
+
 
 
 // Import built-in Node.js package 'path' to resolve path of files that are located on the server
@@ -16,9 +19,25 @@ const PORT = 3001;
 
 // Static middleware pointing to the public folder
 app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const readNotes = async () => {
+  try {
+    const data = await readFileAsync("./db/db.json", 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error in reading notes:', error);
+    throw error;
+  }
+};
 
 const read = () => {
   return  readFileAsync("./db/db.json", 'utf8');
+};
+
+const write = (note) => {
+  return  writeFileAsync("./db/db.json", note);
 };
  
 const readAndAppend = async () => {
@@ -30,6 +49,12 @@ const readAndAppend = async () => {
   return parsedData;
     
 };
+
+const writeToFile = async (content) => {
+  const note = await write(content)  
+}
+  
+
 
 //const writeAndAppend = async () => {
   
@@ -50,30 +75,38 @@ app.get('/api/notes', (req, res) => {
   })
 });
 
-app.post('/api/notes', (req, res) => {
-  // Log that a POST request was received
-  console.info(`${req.method} request received to add a note`);
-  // Destructuring assignment for the items in req.body
+app.post('/api/notes', async (req, res) => {
+  try {
+    console.info(`${req.method} request received to add a note`);
 
-  const note = JSON.parse();
-  console.log(req.body, "here");
-  
-  if (note) {
-    fs.writeFileSync('db.json', JSON.stringify(note));
-    
+    const data = await read();
+    const notes = JSON.parse(data);
 
-    const response = {
+    const newNote = { ...req.body, id: notes.length + 1 };
+
+    notes.push(newNote);
+
+    await write(JSON.stringify(notes));
+
+    res.status(201).json({
       status: 'success',
-      body: note,
-    };
+      body: newNote,
+    });
+  } catch (error) {
+    console.error('Error in adding note:', error);
+    res.status(500).json({ error: 'Error in adding note' });
+  }
+});
 
-    console.log(response);
-    res.status(201).json(response);
-
-  }; /* else {
-    res.status(500).json('Error in posting review');
-    console.log("error posting");
-  }; */
+app.get('/api/notes', async (req, res) => {
+  try {
+    const notes = await readNotes();
+    
+    res.json(notes);
+  } catch (error) {
+    console.error('Error in getting notes:', error);
+    res.status(500).json({ error: 'Error in getting notes' });
+  }
 });
 
 app.get('*', (req, res) =>
