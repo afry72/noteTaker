@@ -2,6 +2,7 @@
 const express = require('express');
 const fs = require('fs');
 const util = require('util');
+//promisifying the readfile and writefile functions from the fs module
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
@@ -22,6 +23,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// this function will parse data and throw an error if there is a problem 
 const readNotes = async () => {
   try {
     const data = await readFileAsync("./db/db.json", 'utf8');
@@ -32,6 +34,7 @@ const readNotes = async () => {
   }
 };
 
+// read and write calls the readfile and writefile consts with the appropriate 
 const read = () => {
   return  readFileAsync("./db/db.json", 'utf8');
 };
@@ -54,19 +57,13 @@ const writeToFile = async (content) => {
   const note = await write(content)  
 }
   
-
-
-//const writeAndAppend = async () => {
-  
-//};
-
 // Create Express.js routes for default '/', '/send' and '/routes' endpoints
 app.get('/', (req, res) => res.send('Navigate to /notes or /index'));
 
 app.get('/notes', (req, res) =>
   res.sendFile(path.join(__dirname, 'public/notes.html'))
 );
-
+// pulling from json and displaying it on the html
 app.get('/api/notes', (req, res) => {
   //console.log("api notes");
   readAndAppend("./db/db.json").then ((parsedData) => {
@@ -74,7 +71,7 @@ app.get('/api/notes', (req, res) => {
     return res.json(parsedData);
   })
 });
-
+//post route that takes data and sends it to the server 
 app.post('/api/notes', async (req, res) => {
   try {
     console.info(`${req.method} request received to add a note`);
