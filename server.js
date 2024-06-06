@@ -16,7 +16,7 @@ const path = require('path');
 const app = express();
 
 // Specify on which port the Express.js server will run
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Static middleware pointing to the public folder
 app.use(express.static('public'));
